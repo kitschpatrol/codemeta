@@ -1,0 +1,23 @@
+onlyBuiltDependencies:
+  - esbuild
+  - puppeteer
+  - tree-sitter
+  - tree-sitter-python
+  - tree-sitter-ruby
+  - unrs-resolver
+
+overrides:
+  glob: ^13.0.6
+
+publicHoistPattern:
+  - '@kitschpatrol/repo-config'
+  - '@kitschpatrol/typescript-config'
+  - case-police
+  - '*cspell*'
+  - '*eslint*'
+  - '*knip*'
+  - '*mdat*'
+  - '*prettier*'
+  - '*remark*'
+  - '*stylelint*'
+  - '*tree-sitter*'
