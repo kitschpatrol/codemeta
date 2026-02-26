@@ -61,12 +61,15 @@ export async function parseNodejs(
 	// Phase 2: Explicit handlers for fields requiring parser-specific logic
 
 	// Homepage — emit as url, and also as codeRepository if it looks like a source repo
+	// normalize-package-data derives homepage from repository.url and appends #readme;
+	// strip that fragment since it's not part of the actual project URL.
 	if (is.string(packageData.homepage)) {
-		graph.addUrl(subject, schema('url'), packageData.homepage)
+		const homepage = packageData.homepage.replace(/#readme$/i, '')
+		graph.addUrl(subject, schema('url'), homepage)
 		if (!graph.hasProperty(subject, schema('codeRepository'))) {
 			for (const sourceRepo of COMMON_SOURCEREPOS) {
-				if (packageData.homepage.startsWith(sourceRepo)) {
-					graph.addUrl(subject, schema('codeRepository'), packageData.homepage)
+				if (homepage.startsWith(sourceRepo)) {
+					graph.addUrl(subject, schema('codeRepository'), homepage)
 					break
 				}
 			}

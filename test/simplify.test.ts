@@ -65,9 +65,7 @@ describe('simplify — singular properties', () => {
 	})
 
 	it('should strip git+ prefix and .git suffix from codeRepository', () => {
-		const result = simplify(
-			codeMeta({ codeRepository: 'git+https://github.com/test/repo.git' }),
-		)
+		const result = simplify(codeMeta({ codeRepository: 'git+https://github.com/test/repo.git' }))
 		expect(result.codeRepository).toBe('https://github.com/test/repo')
 	})
 })
