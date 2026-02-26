@@ -13,6 +13,7 @@ import { parseGoreleaser } from './goreleaser.js'
 import { parseJava } from './java.js'
 import { parseJsonLd } from './jsonld.js'
 import { parseLicenseFile } from './license-file.js'
+import { parseMetadata } from './metadata.js'
 import { parseNodejs } from './nodejs.js'
 import { parsePkgInfo } from './pkg-info.js'
 import { parsePubliccode } from './publiccode.js'
@@ -147,6 +148,13 @@ const parserRegistry: ParserEntry[] = [
 		pattern: /^\.?goreleaser\.ya?ml$/i,
 		primary: true,
 		priority: 10,
+	},
+	{
+		name: 'metadata',
+		parser: parseMetadata,
+		pattern: /^(.+\.)?metadata\.(json|ya?ml)$/i,
+		primary: true,
+		priority: 15,
 	},
 	{
 		name: 'license-file',
