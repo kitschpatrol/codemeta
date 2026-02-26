@@ -58,6 +58,18 @@ describe('simplify — singular properties', () => {
 		const result = simplify(codeMeta({ copyrightYear: 2024 }))
 		expect(result.copyrightYear).toBe(2024)
 	})
+
+	it('should strip git+ prefix and .git suffix from url', () => {
+		const result = simplify(codeMeta({ url: 'git+https://github.com/test/repo.git' }))
+		expect(result.url).toBe('https://github.com/test/repo')
+	})
+
+	it('should strip git+ prefix and .git suffix from codeRepository', () => {
+		const result = simplify(
+			codeMeta({ codeRepository: 'git+https://github.com/test/repo.git' }),
+		)
+		expect(result.codeRepository).toBe('https://github.com/test/repo')
+	})
 })
 
 describe('simplify — person/org array properties', () => {

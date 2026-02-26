@@ -75,6 +75,25 @@ const STRING_ARRAY_PROPERTIES = new Set([
 	'storageRequirements',
 ])
 
+// ─── URL normalization ────────────────────────────────────────────────
+
+/** Properties whose string values should have git+ prefix and .git suffix stripped. */
+const GIT_URL_PROPERTIES = new Set(['codeRepository', 'url'])
+
+/** Strip git+ prefix and .git suffix from a URL. */
+function normalizeGitUrl(value: string): string {
+	let normalized = value
+	if (normalized.startsWith('git+')) {
+		normalized = normalized.slice(4)
+	}
+
+	if (normalized.endsWith('.git')) {
+		normalized = normalized.slice(0, -4)
+	}
+
+	return normalized
+}
+
 // ─── Object flattening helpers ────────────────────────────────────────
 
 /** Flatten a Person or Organization object to simple string fields. */
@@ -144,7 +163,11 @@ export function simplify(meta: CodeMeta): CodeMetaBasic {
 		if (value === undefined || value === null) continue
 
 		if (SINGULAR_PROPERTIES.has(key)) {
-			result[key] = normalizeSingular(key, value)
+			const normalized = normalizeSingular(key, value)
+			result[key] =
+				GIT_URL_PROPERTIES.has(key) && is.string(normalized)
+					? normalizeGitUrl(normalized)
+					: normalized
 		} else if (PERSON_ARRAY_PROPERTIES.has(key)) {
 			result[key] = normalizePersonArray(value)
 		} else if (DEPENDENCY_ARRAY_PROPERTIES.has(key)) {
