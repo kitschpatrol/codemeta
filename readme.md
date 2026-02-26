@@ -45,16 +45,26 @@ Invoke directly in a local project repository directory:
 npx @kitschpatrol/codemeta
 ```
 
+Or, install globally for access across your system:
+
+```sh
+npm install --global @kitschpatrol/codemeta
+```
+
 Or, install locally to access the CLI commands in a single project or to import the provided TypeScript APIs:
 
 ```sh
 npm install @kitschpatrol/codemeta
 ```
 
-Or, install globally for access across your system:
+If you're using PNPM, you can safely ignore the build scripts for the tree-sitter dependencies, since we're only interested in their WASM.
 
-```sh
-npm install --global @kitschpatrol/codemeta
+In your `pnpm-workspace.yaml`:
+
+```yaml
+ignoredBuiltDependencies:
+  - tree-sitter-python
+  - tree-sitter-ruby
 ```
 
 ### Running

@@ -1,9 +1,9 @@
-onlyBuiltDependencies:
-  - esbuild
-  - puppeteer
-  - tree-sitter
+ignoredBuiltDependencies:
   - tree-sitter-python
   - tree-sitter-ruby
+
+onlyBuiltDependencies:
+  - esbuild
   - unrs-resolver
 
 overrides:
