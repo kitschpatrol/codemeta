@@ -4,6 +4,7 @@ import type { NamedNode } from 'n3'
 import is from '@sindresorhus/is'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { basename, resolve } from 'node:path'
+import type { CodeMetaBasic } from './types-basic.js'
 import type { CodeMeta } from './types.js'
 import { crosswalk } from './crosswalk.js'
 import { discover } from './discover.js'
@@ -11,6 +12,7 @@ import { CodeMetaGraph, namedNode, schema } from './graph.js'
 import { log } from './log.js'
 import { enrichGraph, reconcile } from './merge.js'
 import { findParser } from './parsers/index.js'
+import { simplify } from './simplify.js'
 
 const DEFAULT_SUBJECT = 'https://example.org/software'
 
@@ -18,6 +20,8 @@ const DEFAULT_SUBJECT = 'https://example.org/software'
 export type GenerateOptions = {
 	/** Base URI for the `@id` field. If not set, auto-detected from an input `codemeta.json` file's `@id`, or omitted from output. */
 	baseUri?: string
+	/** If `true`, return a simplified {@link CodeMetaBasic} object with predictable types, no JSON-LD boilerplate, and consistent singular/array shapes. */
+	basic?: boolean
 	/** If `true`, infer missing properties from existing metadata (e.g. derive `programmingLanguage` from `runtimePlatform`, copy `author` to `contributor`). */
 	enrich?: boolean
 	/** Glob patterns to exclude from automatic file discovery in directories. */
@@ -50,12 +54,20 @@ export const DEFAULT_GENERATE_OPTIONS: GenerateOptions = {
  * lower-priority ones (e.g. `codemeta.json` at priority 0).
  * @param paths - One or more file or directory paths to scan.
  * @param options - Generation options (enrichment, exclusions, overrides, etc.).
- * @returns A composed CodeMeta JSON-LD object.
+ * @returns A composed CodeMeta JSON-LD object, or a simplified {@link CodeMetaBasic} if `basic` is set.
  */
 export async function generate(
 	paths: string | string[],
+	options: GenerateOptions & { basic: true },
+): Promise<CodeMetaBasic>
+export async function generate(
+	paths: string | string[],
 	options?: GenerateOptions,
-): Promise<CodeMeta> {
+): Promise<CodeMeta>
+export async function generate(
+	paths: string | string[],
+	options?: GenerateOptions,
+): Promise<CodeMeta | CodeMetaBasic> {
 	const resolvedOptions = { ...DEFAULT_GENERATE_OPTIONS, ...options }
 
 	const pathsArray = is.array(paths) ? paths : [paths]
@@ -118,12 +130,20 @@ export async function generate(
  * (e.g. `author`, `softwareRequirements`) are accumulated and deduplicated.
  * @param files - One or more file paths to parse.
  * @param options - Generation options (enrichment, overrides, etc.).
- * @returns A composed CodeMeta JSON-LD object.
+ * @returns A composed CodeMeta JSON-LD object, or a simplified {@link CodeMetaBasic} if `basic` is set.
  */
 export async function generateFromFiles(
 	files: string | string[],
+	options: GenerateOptions & { basic: true },
+): Promise<CodeMetaBasic>
+export async function generateFromFiles(
+	files: string | string[],
 	options?: GenerateOptions,
-): Promise<CodeMeta> {
+): Promise<CodeMeta>
+export async function generateFromFiles(
+	files: string | string[],
+	options?: GenerateOptions,
+): Promise<CodeMeta | CodeMetaBasic> {
 	const resolvedOptions = { ...DEFAULT_GENERATE_OPTIONS, ...options }
 
 	const filesArray = is.array(files) ? files : [files]
@@ -186,6 +206,10 @@ export async function generateFromFiles(
 	const warnings = reconcile(result)
 	for (const warning of warnings) {
 		log.warn(warning.message)
+	}
+
+	if (resolvedOptions.basic) {
+		return simplify(result)
 	}
 
 	return result

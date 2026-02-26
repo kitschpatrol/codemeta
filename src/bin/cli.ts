@@ -32,6 +32,11 @@ const argv = await yargsInstance
 		description: 'Write output to file',
 		type: 'string',
 	})
+	.option('basic', {
+		default: false,
+		description: 'Output simplified metadata with predictable types (no JSON-LD boilerplate)',
+		type: 'boolean',
+	})
 	.option('enrich', {
 		default: false,
 		description: 'Enable automatic inference and enrichment',
@@ -111,6 +116,7 @@ try {
 
 	const meta = await generate((argv.paths as string[]) || ['.'], {
 		baseUri: argv.baseUri,
+		basic: argv.basic,
 		enrich: argv.enrich,
 		exclude: argv.exclude as string[] | undefined,
 		retain: argv.retain,

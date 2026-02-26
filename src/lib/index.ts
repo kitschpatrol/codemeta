@@ -7,6 +7,10 @@ export { DEFAULT_GENERATE_OPTIONS, generate, generateFromFiles } from './generat
 
 export { setLogger } from './log.js'
 
+export { simplify } from './simplify.js'
+
+export type { BasicDependency, BasicPersonOrOrg, CodeMetaBasic } from './types-basic.js'
+
 export type { CodeMeta } from './types.js'
 
 export type { ValidationResult, ValidationWarning } from './validate.js'
