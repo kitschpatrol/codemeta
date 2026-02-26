@@ -179,6 +179,21 @@ describe('simplify — string array properties', () => {
 		expect(result.keywords).toEqual(['typescript'])
 	})
 
+	it('should split comma-delimited keywords', () => {
+		const result = simplify(codeMeta({ keywords: 'typescript, metadata, testing' }))
+		expect(result.keywords).toEqual(['typescript', 'metadata', 'testing'])
+	})
+
+	it('should not split comma-delimited keywords within an array', () => {
+		const result = simplify(codeMeta({ keywords: ['one, two', 'three'] }))
+		expect(result.keywords).toEqual(['one, two', 'three'])
+	})
+
+	it('should split comma-delimited operatingSystem values', () => {
+		const result = simplify(codeMeta({ operatingSystem: 'Linux, macOS, Windows' }))
+		expect(result.operatingSystem).toEqual(['Linux', 'macOS', 'Windows'])
+	})
+
 	it('should keep an array of strings as-is', () => {
 		const result = simplify(codeMeta({ keywords: ['typescript', 'metadata'] }))
 		expect(result.keywords).toEqual(['typescript', 'metadata'])

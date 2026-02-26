@@ -150,7 +150,7 @@ export function simplify(meta: CodeMeta): CodeMetaBasic {
 		} else if (DEPENDENCY_ARRAY_PROPERTIES.has(key)) {
 			result[key] = normalizeDependencyArray(value)
 		} else if (STRING_ARRAY_PROPERTIES.has(key)) {
-			result[key] = normalizeStringArray(value)
+			result[key] = normalizeStringArray(value, key === 'keywords' || key === 'operatingSystem')
 		} else {
 			// Unknown property — pass through
 			result[key] = value
@@ -207,7 +207,15 @@ function normalizeDependencyArray(value: unknown): BasicDependency[] {
 }
 
 /** Normalize a property that should always be an array of strings. */
-function normalizeStringArray(value: unknown): string[] {
+function normalizeStringArray(value: unknown, splitCommas = false): string[] {
+	// Split comma-delimited strings before array normalization
+	if (splitCommas && is.string(value)) {
+		return value
+			.split(',')
+			.map((part) => part.trim())
+			.filter(Boolean)
+	}
+
 	const items = is.array(value) ? value : [value]
 	const result: string[] = []
 	for (const item of items) {
