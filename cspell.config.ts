@@ -10,6 +10,7 @@ export default cspellConfig({
 		'test/parsers.*',
 	],
 	words: [
+		'agalitsyna',
 		'analiticcl',
 		'ASCL',
 		'askalono',
@@ -34,6 +35,7 @@ export default cspellConfig({
 		'DOAP',
 		'fastapi',
 		'Figshare',
+		'fontanka',
 		'funder',
 		'Geoscience',
 		'Geospatial',
