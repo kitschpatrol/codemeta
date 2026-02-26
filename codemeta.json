@@ -23,7 +23,7 @@
 	"license": "http://spdx.org/licenses/Apache-2.0",
 	"name": "codemeta",
 	"programmingLanguage": "Typescript",
-	"runtimePlatform": "node >=22.17.0",
+	"runtimePlatform": "node >=20.19.0",
 	"softwareRequirements": [
 		{
 			"@type": "SoftwareSourceCode",
@@ -111,12 +111,6 @@
 		},
 		{
 			"@type": "SoftwareSourceCode",
-			"identifier": "tree-sitter",
-			"name": "tree-sitter",
-			"version": "^0.25.0"
-		},
-		{
-			"@type": "SoftwareSourceCode",
 			"identifier": "tree-sitter-python",
 			"name": "tree-sitter-python",
 			"version": "^0.25.0"
@@ -138,6 +132,12 @@
 			"identifier": "unified",
 			"name": "unified",
 			"version": "^11.0.5"
+		},
+		{
+			"@type": "SoftwareSourceCode",
+			"identifier": "web-tree-sitter",
+			"name": "web-tree-sitter",
+			"version": "^0.25.10"
 		},
 		{
 			"@type": "SoftwareSourceCode",
@@ -179,7 +179,7 @@
 			"@type": "SoftwareSourceCode",
 			"identifier": "@kitschpatrol/shared-config",
 			"name": "@kitschpatrol/shared-config",
-			"version": "^6.0.0"
+			"version": "^6.0.1"
 		},
 		{
 			"@type": "SoftwareSourceCode",
@@ -203,7 +203,7 @@
 			"@type": "SoftwareSourceCode",
 			"identifier": "@types/node",
 			"name": "@types/node",
-			"version": "~20.17.58"
+			"version": "~20.19.35"
 		},
 		{
 			"@type": "SoftwareSourceCode",
@@ -228,18 +228,6 @@
 			"identifier": "mdat-plugin-cli-help",
 			"name": "mdat-plugin-cli-help",
 			"version": "^1.0.7"
-		},
-		{
-			"@type": "SoftwareSourceCode",
-			"identifier": "node-addon-api",
-			"name": "node-addon-api",
-			"version": "^8.5.0"
-		},
-		{
-			"@type": "SoftwareSourceCode",
-			"identifier": "node-gyp",
-			"name": "node-gyp",
-			"version": "^12.2.0"
 		},
 		{
 			"@type": "SoftwareSourceCode",

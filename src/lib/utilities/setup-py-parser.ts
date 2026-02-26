@@ -2,7 +2,6 @@
 /* eslint-disable ts/no-unsafe-member-access */
 /* eslint-disable ts/no-explicit-any */
 /* eslint-disable ts/no-unsafe-type-assertion */
-/* eslint-disable ts/no-unsafe-argument */
 /**
  * Tree-sitter-based setup.py parser.
  * Extracts metadata from Python setup() calls without executing Python.
@@ -11,8 +10,8 @@
  * Variable references and dynamic expressions are skipped (returned as null).
  */
 
-import Parser from 'tree-sitter'
-import Python from 'tree-sitter-python'
+import type { Node } from 'web-tree-sitter'
+import { getPythonLanguage, initParser } from './tree-sitter-wasm.js'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -39,6 +38,11 @@ type SetupPyData = {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+/** Filter nulls from web-tree-sitter's `namedChildren` array. */
+function children(node: Node): Node[] {
+	return node.namedChildren.filter((c): c is Node => c !== null)
+}
+
 function emptySetupPyData(): SetupPyData {
 	return {
 		author: null,
@@ -62,11 +66,11 @@ function emptySetupPyData(): SetupPyData {
 }
 
 /** Extract a string literal value from a tree-sitter node. */
-function extractString(node: Parser.SyntaxNode): null | string {
+function extractString(node: Node): null | string {
 	switch (node.type) {
 		case 'concatenated_string': {
 			// "hello" "world" → "helloworld"
-			const parts = node.namedChildren
+			const parts = children(node)
 				.map((child) => extractString(child))
 				.filter((s): s is string => s !== null)
 			return parts.length > 0 ? parts.join('') : null
@@ -78,7 +82,7 @@ function extractString(node: Parser.SyntaxNode): null | string {
 		case 'string': {
 			// Python strings: 'value', "value", '''value''', """value"""
 			// Only match string_content — string_start/string_end are just quote chars
-			const content = node.namedChildren.find((c) => c.type === 'string_content')
+			const content = children(node).find((c) => c.type === 'string_content')
 			if (content) return content.text
 			// Fallback: strip quotes manually (b/f/r/u are Python string prefixes)
 			const raw = node.text
@@ -99,16 +103,16 @@ function extractString(node: Parser.SyntaxNode): null | string {
 }
 
 /** Extract a list of strings from an array/list literal node. */
-function extractStringList(node: Parser.SyntaxNode): string[] {
+function extractStringList(node: Node): string[] {
 	if (node.type === 'list') {
-		return node.namedChildren
+		return children(node)
 			.map((child) => extractString(child))
 			.filter((s): s is string => s !== null)
 	}
 
 	// Tuple
 	if (node.type === 'tuple') {
-		return node.namedChildren
+		return children(node)
 			.map((child) => extractString(child))
 			.filter((s): s is string => s !== null)
 	}
@@ -119,11 +123,11 @@ function extractStringList(node: Parser.SyntaxNode): string[] {
 }
 
 /** Extract a dict literal into a Record<string, string>. */
-function extractStringDict(node: Parser.SyntaxNode): Record<string, string> {
+function extractStringDict(node: Node): Record<string, string> {
 	const result: Record<string, string> = {}
 	if (node.type !== 'dictionary') return result
 
-	for (const pair of node.namedChildren) {
+	for (const pair of children(node)) {
 		if (pair.type !== 'pair') continue
 		const key = pair.childForFieldName('key')
 		const value = pair.childForFieldName('value')
@@ -137,11 +141,11 @@ function extractStringDict(node: Parser.SyntaxNode): Record<string, string> {
 }
 
 /** Extract a dict of string lists (for extras_require). */
-function extractStringListDict(node: Parser.SyntaxNode): Record<string, string[]> {
+function extractStringListDict(node: Node): Record<string, string[]> {
 	const result: Record<string, string[]> = {}
 	if (node.type !== 'dictionary') return result
 
-	for (const pair of node.namedChildren) {
+	for (const pair of children(node)) {
 		if (pair.type !== 'pair') continue
 		const key = pair.childForFieldName('key')
 		const value = pair.childForFieldName('value')
@@ -179,11 +183,13 @@ const STRING_ATTRS = new Set<keyof SetupPyData>([
  * (string/list literals) are extracted — variables and dynamic expressions
  * are skipped.
  */
-export function parseSetupPySource(source: string): SetupPyData {
-	const parser = new Parser()
-	parser.setLanguage(Python as any)
+export async function parseSetupPySource(source: string): Promise<SetupPyData> {
+	const parser = await initParser()
+	const python = await getPythonLanguage()
+	parser.setLanguage(python)
 
 	const tree = parser.parse(source)
+	if (!tree) throw new Error('Failed to parse setup.py source')
 	const data = emptySetupPyData()
 
 	// Find the setup() call in the AST
@@ -194,7 +200,7 @@ export function parseSetupPySource(source: string): SetupPyData {
 	const args = setupCall.childForFieldName('arguments')
 	if (!args) return data
 
-	for (const child of args.namedChildren) {
+	for (const child of children(args)) {
 		if (child.type !== 'keyword_argument') continue
 
 		const nameNode = child.childForFieldName('name')
@@ -254,7 +260,7 @@ export function parseSetupPySource(source: string): SetupPyData {
 /**
  * Recursively find the setup() or setuptools.setup() call in the AST.
  */
-function findSetupCall(node: Parser.SyntaxNode): null | Parser.SyntaxNode {
+function findSetupCall(node: Node): Node | null {
 	if (node.type === 'call') {
 		const function_ = node.childForFieldName('function')
 		if (function_) {
@@ -273,7 +279,7 @@ function findSetupCall(node: Parser.SyntaxNode): null | Parser.SyntaxNode {
 		}
 	}
 
-	for (const child of node.namedChildren) {
+	for (const child of children(node)) {
 		const result = findSetupCall(child)
 		if (result) return result
 	}

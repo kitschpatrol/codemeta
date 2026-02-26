@@ -1,7 +1,6 @@
 /* eslint-disable ts/no-unsafe-member-access */
 /* eslint-disable ts/no-explicit-any */
 /* eslint-disable ts/no-unsafe-type-assertion */
-/* eslint-disable ts/no-unsafe-argument */
 /* eslint-disable unicorn/prefer-set-has */
 /* eslint-disable ts/naming-convention */
 /**
@@ -9,8 +8,8 @@
  * Transforming to Codemeta format
  */
 
-import Parser from 'tree-sitter'
-import Ruby from 'tree-sitter-ruby'
+import type { Node } from 'web-tree-sitter'
+import { getRubyLanguage, initParser } from './tree-sitter-wasm.js'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -84,11 +83,16 @@ function emptySpec(): GemSpec {
 	}
 }
 
+/** Filter nulls from web-tree-sitter's `namedChildren` array. */
+function children(node: Node): Node[] {
+	return node.namedChildren.filter((c): c is Node => c !== null)
+}
+
 /** Methods that return the receiver unchanged — safe to unwrap. */
 const IDENTITY_METHODS = new Set(['-@', 'dup', 'freeze'])
 
 /** Extract the raw string value from a tree-sitter string/symbol node. */
-function extractString(node: Parser.SyntaxNode): null | string {
+function extractString(node: Node): null | string {
 	switch (node.type) {
 		case 'call': {
 			// Handle "value".freeze, "value".dup, -"value" (frozen string literal)
@@ -112,7 +116,7 @@ function extractString(node: Parser.SyntaxNode): null | string {
 		case 'string':
 		case 'string_content': {
 			// A string node wraps string_content children; grab all content fragments
-			const parts = node.namedChildren.filter((c) => c.type === 'string_content')
+			const parts = children(node).filter((c) => c.type === 'string_content')
 			if (parts.length > 0) return parts.map((p) => p.text).join('')
 			// Simple string with no interpolation
 			return node.text.replaceAll(/^["']|["']$/g, '')
@@ -124,15 +128,15 @@ function extractString(node: Parser.SyntaxNode): null | string {
 }
 
 /** Extract a string array from an array node like `["a", "b"]`. */
-function extractStringArray(node: Parser.SyntaxNode): string[] {
+function extractStringArray(node: Node): string[] {
 	if (node.type === 'array') {
-		return node.namedChildren
+		return children(node)
 			.map((element) => extractString(element))
 			.filter((s): s is string => s !== null)
 	}
 	// %w[] word arrays appear as string_array
 	if (node.type === 'string_array') {
-		return node.namedChildren.map((c) => (c.type === 'bare_string' ? c.text : c.text))
+		return children(node).map((c) => (c.type === 'bare_string' ? c.text : c.text))
 	}
 	// Single value → wrap in array
 	const single = extractString(node)
@@ -144,7 +148,7 @@ function extractStringArray(node: Parser.SyntaxNode): string[] {
  * Returns string | string[] | null — we intentionally skip expressions
  * we can't statically evaluate (method calls, constants, etc.).
  */
-function extractValue(node: Parser.SyntaxNode): null | string | string[] {
+function extractValue(node: Node): null | string | string[] {
 	if (node.type === 'array' || node.type === 'string_array') {
 		return extractStringArray(node)
 	}
@@ -163,7 +167,7 @@ function extractValue(node: Parser.SyntaxNode): null | string | string[] {
 }
 
 /** Resolve the attribute name from the LHS of `spec.foo = ...` */
-function resolveAttribute(node: Parser.SyntaxNode): null | string {
+function resolveAttribute(node: Node): null | string {
 	// Node is a `call` like `spec.name`  or a  `method_call`
 	if (node.type === 'call') {
 		const methodNode = node.childForFieldName('method')
@@ -180,7 +184,7 @@ const DEP_METHODS: Record<string, GemSpecDependency['type']> = {
 	add_runtime_dependency: 'runtime',
 }
 
-function tryParseDependency(node: Parser.SyntaxNode): GemSpecDependency | null {
+function tryParseDependency(node: Node): GemSpecDependency | null {
 	// We're looking for:  spec.add_dependency "name", "~> 1.0"
 	if (node.type !== 'call' && node.type !== 'method_call') return null
 
@@ -231,7 +235,7 @@ function tryParseDependency(node: Parser.SyntaxNode): GemSpecDependency | null {
 	const args = node.childForFieldName('arguments')
 	if (!args) return null
 
-	const argNodes = args.namedChildren
+	const argNodes = children(args)
 	if (argNodes.length === 0) return null
 
 	const depName = extractString(argNodes[0])
@@ -247,11 +251,11 @@ function tryParseDependency(node: Parser.SyntaxNode): GemSpecDependency | null {
 
 // ─── Metadata hash extraction ────────────────────────────────────────────────
 
-function extractHash(node: Parser.SyntaxNode): Record<string, string> {
+function extractHash(node: Node): Record<string, string> {
 	const result: Record<string, string> = {}
 	if (node.type !== 'hash') return result
 
-	for (const pair of node.namedChildren) {
+	for (const pair of children(node)) {
 		if (pair.type !== 'pair') continue
 		const key = pair.childForFieldName('key')
 		const value = pair.childForFieldName('value')
@@ -276,11 +280,13 @@ function extractHash(node: Parser.SyntaxNode): Record<string, string> {
  * expressions (e.g. `Dir.glob(...)`) will be `null` / empty — the parser
  * only extracts statically determinable values.
  */
-export function parseGemspec(source: string): GemSpec {
-	const parser = new Parser()
-	parser.setLanguage(Ruby as any)
+export async function parseGemspec(source: string): Promise<GemSpec> {
+	const parser = await initParser()
+	const ruby = await getRubyLanguage()
+	parser.setLanguage(ruby)
 
 	const tree = parser.parse(source)
+	if (!tree) throw new Error('Failed to parse gemspec source')
 	const spec = emptySpec()
 
 	/** Map of simple attribute names → setter logic */
@@ -312,7 +318,7 @@ export function parseGemspec(source: string): GemSpec {
 		'extensions',
 	]
 
-	function visit(node: Parser.SyntaxNode): void {
+	function visit(node: Node): void {
 		// ── Assignment: spec.attr = value ──────────────────────────────────
 		if (node.type === 'assignment') {
 			const lhs = node.childForFieldName('left')
@@ -380,8 +386,8 @@ export function parseGemspec(source: string): GemSpec {
 		visitChildren(node)
 	}
 
-	function visitChildren(node: Parser.SyntaxNode): void {
-		for (const child of node.namedChildren) {
+	function visitChildren(node: Node): void {
+		for (const child of children(node)) {
 			visit(child)
 		}
 	}

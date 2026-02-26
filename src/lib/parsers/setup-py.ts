@@ -22,7 +22,7 @@ export async function parseSetupPy(
 	crosswalk: Crosswalk,
 ): Promise<string[]> {
 	const content = readFileSync(filePath, 'utf8')
-	const data = parseSetupPySource(content)
+	const data = await parseSetupPySource(content)
 	const warnings: string[] = []
 
 	graph.setType(subject, schema('SoftwareSourceCode'))

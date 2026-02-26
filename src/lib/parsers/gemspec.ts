@@ -39,7 +39,7 @@ export async function parseGemspecFile(
 	_crosswalk: Crosswalk,
 ): Promise<string[]> {
 	const content = readFileSync(filePath, 'utf8')
-	const spec = parseGemspec(content)
+	const spec = await parseGemspec(content)
 	const warnings: string[] = []
 
 	graph.setType(subject, schema('SoftwareSourceCode'))
