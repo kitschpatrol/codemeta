@@ -89,7 +89,6 @@ const IGNORE_ONLY_THEIRS = new Set([
 	'developmentStatus', // Codemetapy infers from classifiers/enrichment
 	'isSourceCodeOf', // Codemetapy adds this for Poetry; not in source
 	'maintainer', // Codemetapy enriches maintainer from CRAN author roles; not always in source
-	'readme', // Codemetapy invents this; not in source files
 	'relatedLink', // Codemetapy infers this; not always in source
 	'releaseNotes', // Codemetapy infers this; not in source
 	'repository', // Codemetapy maps Maven <repositories> to repository (artifact repos, not source)
@@ -115,6 +114,10 @@ function normalizeDocument(document: Record<string, unknown>): Record<string, un
 
 	// Strip identifier — we always emit it, codemetapy doesn't consistently
 	delete clone.identifier
+
+	// Strip readme — we construct web URLs from codeRepository + filename,
+	// codemetapy emits bare filenames or doesn't emit at all. Intentional improvement.
+	delete clone.readme
 
 	// Sort keyword arrays (codemetapy sorts alphabetically)
 	if (Array.isArray(clone.keywords)) {
