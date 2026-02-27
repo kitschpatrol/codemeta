@@ -61,4 +61,16 @@ describe('Node.js parser', () => {
 		const meta = await parseToJsonLd(resolve(import.meta.dirname, '..', 'package.json'))
 		expect(meta.programmingLanguage).toBe('Typescript')
 	})
+
+	it('should construct readme web URL from codeRepository', async () => {
+		const readmeFixtures = resolve(import.meta.dirname, 'fixtures/package-readme')
+		const meta = await parseToJsonLd(resolve(readmeFixtures, 'github-repo.package.json'))
+		expect(meta.readme).toBe('https://github.com/test-org/test-project/blob/HEAD/README.md')
+	})
+
+	it('should fall back to readme filename when no codeRepository', async () => {
+		const readmeFixtures = resolve(import.meta.dirname, 'fixtures/package-readme')
+		const meta = await parseToJsonLd(resolve(readmeFixtures, 'no-repo.package.json'))
+		expect(meta.readme).toBe('README.md')
+	})
 })

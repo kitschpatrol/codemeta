@@ -76,6 +76,20 @@ export const INTERFACE_CLUES: Array<[string, string]> = [
 	[' api ', 'SoftwareLibrary'],
 ]
 
+/** Construct a web URL to a file on a known source forge, or undefined if the forge is not recognized. */
+export function readmeWebUrl(repoUrl: string, filename: string): string | undefined {
+	const url = repoUrl.replace(/\/$/, '')
+	if (url.startsWith('https://github.com/') || url.startsWith('http://github.com/')) {
+		return `${url}/blob/HEAD/${filename}`
+	}
+
+	if (url.startsWith('https://gitlab.com/') || url.startsWith('http://gitlab.com/')) {
+		return `${url}/-/blob/HEAD/${filename}`
+	}
+
+	return undefined
+}
+
 /** Dependencies that suggest a certain interface type */
 export const INTERFACE_CLUES_DEPS: Record<string, string> = {
 	angular: 'WebApplication',

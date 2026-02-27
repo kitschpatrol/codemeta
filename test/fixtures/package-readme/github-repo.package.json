@@ -1,0 +1,10 @@
+{
+	"name": "test-project",
+	"version": "1.0.0",
+	"description": "A test project",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/test-org/test-project"
+	},
+	"license": "MIT"
+}

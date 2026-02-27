@@ -3,7 +3,9 @@
 import type { NamedNode } from 'n3'
 import is from '@sindresorhus/is'
 import { get } from 'es-toolkit/compat'
+import { readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
+import { dirname } from 'node:path'
 // Alternatives do not normalize as aggressively
 // eslint-disable-next-line depend/ban-dependencies
 import { parsePackage } from 'read-pkg'
@@ -14,8 +16,8 @@ import { parsePackage } from 'read-pkg'
 import { t } from 'try'
 import type { Crosswalk } from '../crosswalk.js'
 import type { CodeMetaGraph } from '../graph.js'
-import { COMMON_SOURCEREPOS } from '../constants.js'
-import { schema } from '../graph.js'
+import { COMMON_SOURCEREPOS, readmeWebUrl } from '../constants.js'
+import { codemeta, schema } from '../graph.js'
 
 /**
  * Source fields that need parser-specific handling beyond what addPropertySmart
@@ -85,5 +87,27 @@ export async function parseNodejs(
 		hasTypeScript ? 'Typescript' : 'Javascript',
 	)
 
+	// Readme — link to the project README file, preferring a web URL
+	const readmeFile = findReadmeFile(dirname(filePath))
+	if (readmeFile) {
+		const repos = graph.getValues(subject, schema('codeRepository'))
+		const url = repos.length > 0 ? readmeWebUrl(repos[0], readmeFile) : undefined
+		if (url) {
+			graph.addUrl(subject, codemeta('readme'), url)
+		} else {
+			graph.addString(subject, codemeta('readme'), readmeFile)
+		}
+	}
+
 	return []
+}
+
+/** Find a README file in the given directory. */
+function findReadmeFile(directory: string): string | undefined {
+	try {
+		const files = readdirSync(directory)
+		return files.find((f) => /^readme(?:\.\w+)?$/i.test(f))
+	} catch {
+		return undefined
+	}
 }

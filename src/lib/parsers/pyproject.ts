@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs'
 import { parse as parseToml } from 'smol-toml'
 import type { Crosswalk } from '../crosswalk.js'
 import type { CodeMetaGraph } from '../graph.js'
+import { readmeWebUrl } from '../constants.js'
 import { codemeta, schema } from '../graph.js'
 import { emitPythonDeps, parseClassifier, parseUrl } from './python-utils.js'
 
@@ -115,9 +116,19 @@ export async function parsePyproject(
 		}
 	}
 
-	// Readme — only emit URL values, skip filenames
-	if (is.string(project.readme) && project.readme.startsWith('http')) {
-		graph.addUrl(subject, codemeta('readme'), project.readme)
+	// Readme — prefer web URL, fall back to filename
+	if (is.string(project.readme)) {
+		if (project.readme.startsWith('http')) {
+			graph.addUrl(subject, codemeta('readme'), project.readme)
+		} else {
+			const repos = graph.getValues(subject, schema('codeRepository'))
+			const url = repos.length > 0 ? readmeWebUrl(repos[0], project.readme) : undefined
+			if (url) {
+				graph.addUrl(subject, codemeta('readme'), url)
+			} else {
+				graph.addString(subject, codemeta('readme'), project.readme)
+			}
+		}
 	}
 
 	// License-expression (PEP 639)

@@ -90,9 +90,9 @@ describe('Rust parser — basic Cargo.toml (proycon-analiticcl)', () => {
 		expect(suggestions[0].version).toBe('0.3.6')
 	})
 
-	it('should skip readme when it is a filename', async () => {
+	it('should construct readme web URL from codeRepository and filename', async () => {
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.readme).toBeUndefined()
+		expect(meta.readme).toBe('https://github.com/proycon/analiticcl/blob/HEAD/README.md')
 	})
 
 	it('should set programmingLanguage to Rust', async () => {

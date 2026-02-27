@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs'
 import { parse as parseToml } from 'smol-toml'
 import type { Crosswalk } from '../crosswalk.js'
 import type { CodeMetaGraph } from '../graph.js'
-import { COMMON_SOURCEREPOS } from '../constants.js'
+import { COMMON_SOURCEREPOS, readmeWebUrl } from '../constants.js'
 import { codemeta, schema } from '../graph.js'
 
 /**
@@ -20,7 +20,7 @@ import { codemeta, schema } from '../graph.js'
 const EXPLICIT_HANDLERS = new Set([
 	// SoftwareHelp type is CreativeWork; addPropertySmart can't route it
 	'package.documentation',
-	// Readme is usually a filename, only emit URL values
+	// Readme needs web URL construction from codeRepository
 	'package.readme',
 ])
 
@@ -61,9 +61,19 @@ export async function parseRust(
 		graph.addUrl(subject, schema('softwareHelp'), pkg.documentation)
 	}
 
-	// Readme — only emit URL values, skip filenames
-	if (is.string(pkg.readme) && pkg.readme.startsWith('http')) {
-		graph.addUrl(subject, codemeta('readme'), pkg.readme)
+	// Readme — prefer web URL, fall back to filename
+	if (is.string(pkg.readme)) {
+		if (pkg.readme.startsWith('http')) {
+			graph.addUrl(subject, codemeta('readme'), pkg.readme)
+		} else {
+			const repos = graph.getValues(subject, schema('codeRepository'))
+			const url = repos.length > 0 ? readmeWebUrl(repos[0], pkg.readme) : undefined
+			if (url) {
+				graph.addUrl(subject, codemeta('readme'), url)
+			} else {
+				graph.addString(subject, codemeta('readme'), pkg.readme)
+			}
+		}
 	}
 
 	// Homepage → codeRepository fallback (if repository isn't set and homepage
