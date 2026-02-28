@@ -141,7 +141,7 @@
 		}
 	],
 	"url": "https://github.com/kitschpatrol/codemeta",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"issueTracker": "https://github.com/kitschpatrol/codemeta/issues",
 	"maintainer": {
 		"@type": "Person",

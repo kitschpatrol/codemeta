@@ -1,6 +1,6 @@
 {
 	"name": "@kitschpatrol/codemeta",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"description": "A CLI tool and TypeScript library to discover and map software project metadata from various ecosystems to the CodeMeta standard.",
 	"keywords": [
 		"metadata",
