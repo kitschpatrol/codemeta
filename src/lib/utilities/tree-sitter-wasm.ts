@@ -3,7 +3,7 @@
  * Provides singleton initialization and cached language loading.
  */
 
-import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 import { Language, Parser } from 'web-tree-sitter'
 
 let initialized = false
@@ -17,23 +17,20 @@ export async function initParser(): Promise<Parser> {
 	return new Parser()
 }
 
-/** Load a WASM language grammar from a tree-sitter-* package. */
-async function loadLanguage(packageName: string, wasmFile: string): Promise<Language> {
-	const require = createRequire(import.meta.url)
-	const wasmPath = require.resolve(`${packageName}/${wasmFile}`)
-	return Language.load(wasmPath)
-}
-
 let rubyLanguage: Language | undefined
 /** Get the Ruby language (cached after first load). */
 export async function getRubyLanguage(): Promise<Language> {
-	rubyLanguage ??= await loadLanguage('tree-sitter-ruby', 'tree-sitter-ruby.wasm')
+	rubyLanguage ??= await Language.load(
+		fileURLToPath(new URL('../grammars/tree-sitter-ruby.wasm', import.meta.url)),
+	)
 	return rubyLanguage
 }
 
 let pythonLanguage: Language | undefined
 /** Get the Python language (cached after first load). */
 export async function getPythonLanguage(): Promise<Language> {
-	pythonLanguage ??= await loadLanguage('tree-sitter-python', 'tree-sitter-python.wasm')
+	pythonLanguage ??= await Language.load(
+		fileURLToPath(new URL('../grammars/tree-sitter-python.wasm', import.meta.url)),
+	)
 	return pythonLanguage
 }

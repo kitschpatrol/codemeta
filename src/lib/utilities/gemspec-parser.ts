@@ -85,6 +85,7 @@ function emptySpec(): GemSpec {
 
 /** Filter nulls from web-tree-sitter's `namedChildren` array. */
 function children(node: Node): Node[] {
+	// eslint-disable-next-line ts/no-unnecessary-condition
 	return node.namedChildren.filter((c): c is Node => c !== null)
 }
 

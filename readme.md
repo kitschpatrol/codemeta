@@ -57,16 +57,6 @@ Or, install locally to access the CLI commands in a single project or to import 
 npm install @kitschpatrol/codemeta
 ```
 
-If you're using PNPM, you can safely ignore the build scripts for the tree-sitter dependencies, since we're only interested in their WASM.
-
-In your `pnpm-workspace.yaml`:
-
-```yaml
-ignoredBuiltDependencies:
-  - tree-sitter-python
-  - tree-sitter-ruby
-```
-
 ### Running
 
 Navigate to the root of a local project and run the CLI to generate and emit CodeMeta JSON to stdout:

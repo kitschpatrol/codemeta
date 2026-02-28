@@ -111,18 +111,6 @@
 		},
 		{
 			"@type": "SoftwareSourceCode",
-			"identifier": "tree-sitter-python",
-			"name": "tree-sitter-python",
-			"version": "^0.25.0"
-		},
-		{
-			"@type": "SoftwareSourceCode",
-			"identifier": "tree-sitter-ruby",
-			"name": "tree-sitter-ruby",
-			"version": "^0.23.1"
-		},
-		{
-			"@type": "SoftwareSourceCode",
 			"identifier": "try",
 			"name": "try",
 			"version": "^1.0.3"
@@ -235,6 +223,18 @@
 			"identifier": "publint",
 			"name": "publint",
 			"version": "^0.3.17"
+		},
+		{
+			"@type": "SoftwareSourceCode",
+			"identifier": "tree-sitter-python",
+			"name": "tree-sitter-python",
+			"version": "^0.25.0"
+		},
+		{
+			"@type": "SoftwareSourceCode",
+			"identifier": "tree-sitter-ruby",
+			"name": "tree-sitter-ruby",
+			"version": "^0.23.1"
 		},
 		{
 			"@type": "SoftwareSourceCode",
