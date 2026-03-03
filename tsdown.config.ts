@@ -1,13 +1,23 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig([
+	// CLI
 	{
 		dts: false,
 		entry: 'src/bin/cli.ts',
 		fixedExtension: false,
+		inlineOnly: false,
+		inputOptions: {
+			checks: {
+				// In web-tree-sitter...
+				eval: false,
+			},
+		},
 		minify: true,
+		noExternal: /.*/,
 		outDir: 'dist/bin',
 	},
+	// Library
 	{
 		attw: {
 			profile: 'esm-only',
@@ -33,7 +43,6 @@ export default defineConfig([
 		],
 		entry: 'src/lib/index.ts',
 		fixedExtension: false,
-		minify: true,
 		outDir: 'dist/lib',
 		publint: true,
 		tsconfig: 'tsconfig.build.json',

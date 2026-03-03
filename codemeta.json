@@ -35,13 +35,13 @@
 			"@type": "SoftwareSourceCode",
 			"identifier": "es-toolkit",
 			"name": "es-toolkit",
-			"version": "^1.44.0"
+			"version": "^1.45.0"
 		},
 		{
 			"@type": "SoftwareSourceCode",
 			"identifier": "fast-xml-parser",
 			"name": "fast-xml-parser",
-			"version": "^5.4.1"
+			"version": "^5.4.2"
 		},
 		{
 			"@type": "SoftwareSourceCode",
@@ -168,7 +168,7 @@
 			"@type": "SoftwareSourceCode",
 			"identifier": "@kitschpatrol/shared-config",
 			"name": "@kitschpatrol/shared-config",
-			"version": "^6.0.1"
+			"version": "^6.0.2"
 		},
 		{
 			"@type": "SoftwareSourceCode",
@@ -222,7 +222,7 @@
 			"@type": "SoftwareSourceCode",
 			"identifier": "publint",
 			"name": "publint",
-			"version": "^0.3.17"
+			"version": "^0.3.18"
 		},
 		{
 			"@type": "SoftwareSourceCode",
