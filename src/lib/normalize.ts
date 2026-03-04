@@ -7,7 +7,7 @@ import spdxCorrect from 'spdx-correct'
 import spdxLicenseIds from 'spdx-license-ids' with { type: 'json' }
 import { REPOSTATUS_MAP, REPOSTATUS_VALUES } from './constants.js'
 
-const SPDX_BASE = 'http://spdx.org/licenses/'
+const SPDX_BASE = 'https://spdx.org/licenses/'
 
 /** Deprecated SPDX identifiers that should resolve to -only (not -or-later) */
 const DEPRECATED_TO_ONLY: Record<string, string> = {

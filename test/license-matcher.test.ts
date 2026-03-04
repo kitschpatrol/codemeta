@@ -58,9 +58,9 @@ describe('license matcher — spdx-license-list exhaustive', () => {
 		['GPL-1.0', 'GPL-1.0-only', 'GPL-1.0-or-later'],
 		['GPL-2.0', 'GPL-2.0-only', 'GPL-2.0-or-later'],
 		['GPL-3.0', 'GPL-3.0-only', 'GPL-3.0-or-later'],
-		['LGPL-2.0', 'LGPL-2.0-only', 'LGPL-2.0-or-later'],
-		['LGPL-2.1', 'LGPL-2.1-only', 'LGPL-2.1-or-later'],
-		['LGPL-3.0', 'LGPL-3.0-only', 'LGPL-3.0-or-later'],
+		['LGPL-2.0', 'LGPL-2.0-only', 'LGPL-2.0-or-later', 'LGPL-2.0+'],
+		['LGPL-2.1', 'LGPL-2.1-only', 'LGPL-2.1-or-later', 'LGPL-2.1+'],
+		['LGPL-3.0', 'LGPL-3.0-only', 'LGPL-3.0-or-later', 'LGPL-3.0+'],
 		[
 			'GFDL-1.1',
 			'GFDL-1.1-invariants-only',

@@ -9,7 +9,7 @@
  * Both strategies normalize documents before comparing, to filter out noise:
  * - Empty string values (codemetapy bug: emits `familyName: ""`)
  * - Keyword array ordering (codemetapy sorts, we preserve source order)
- * - License URL scheme (`https://spdx.org/` → `http://spdx.org/`)
+ * - License URL scheme (`http://spdx.org/` → `https://spdx.org/`)
  * - `schema:` prefixed keys (namespace serialization artifacts)
  */
 
@@ -124,7 +124,7 @@ function normalizeDocument(document: Record<string, unknown>): Record<string, un
 		clone.keywords = (clone.keywords as string[]).toSorted()
 	}
 
-	// Normalize license URLs: https://spdx.org/ → http://spdx.org/
+	// Normalize license URLs: http://spdx.org/ → https://spdx.org/
 	normalizeLicenseUrls(clone)
 
 	// Merge softwareSuggestions into softwareRequirements for comparison.
@@ -345,18 +345,40 @@ function renameSchemaKeys(object: Record<string, unknown>): void {
 	}
 }
 
+/** Deprecated SPDX identifiers that resolve to -only (codemetapy preserves, we normalize) */
+const COMPARE_DEPRECATED_TO_ONLY: Record<string, string> = {
+	'AGPL-3.0': 'AGPL-3.0-only',
+	'GPL-2.0': 'GPL-2.0-only',
+	'GPL-3.0': 'GPL-3.0-only',
+	'LGPL-2.0': 'LGPL-2.0-only',
+	'LGPL-2.1': 'LGPL-2.1-only',
+	'LGPL-3.0': 'LGPL-3.0-only',
+}
+
 /**
  * Normalize license URLs in a document.
- * - https://spdx.org/ → http://spdx.org/
- * - Bare SPDX IDs (e.g. "MIT") → full URL ("http://spdx.org/licenses/MIT")
- * This handles the difference between codemetapy (which sometimes emits bare IDs)
- * and our code (which normalizes to full SPDX URLs).
+ * - http://spdx.org/ → https://spdx.org/
+ * - .html suffix stripped
+ * - Deprecated SPDX IDs (e.g. GPL-3.0) → current form (GPL-3.0-only)
+ * - Bare SPDX IDs (e.g. "MIT") → full URL ("https://spdx.org/licenses/MIT")
+ * This handles differences between codemetapy and our code for parity comparison.
  */
 const normalizeSingleLicense = (value: string): string => {
-	let normalized = value.replace('https://spdx.org/', 'http://spdx.org/')
+	let normalized = value.replace('http://spdx.org/', 'https://spdx.org/')
+	// Strip .html suffix from SPDX URLs (codemetapy preserves them, we strip them)
+	normalized = normalized.replace(/^(https:\/\/spdx\.org\/licenses\/\S+?)\.html$/, '$1')
+	// Normalize deprecated SPDX IDs
+	const spdxPrefix = 'https://spdx.org/licenses/'
+	if (normalized.startsWith(spdxPrefix)) {
+		const id = normalized.slice(spdxPrefix.length)
+		if (id in COMPARE_DEPRECATED_TO_ONLY) {
+			normalized = spdxPrefix + COMPARE_DEPRECATED_TO_ONLY[id]
+		}
+	}
+
 	// If not already a URL, wrap bare SPDX IDs in the standard URL form
 	if (!normalized.startsWith('http') && !normalized.includes('/')) {
-		normalized = `http://spdx.org/licenses/${normalized}`
+		normalized = `https://spdx.org/licenses/${normalized}`
 	}
 	return normalized
 }
@@ -902,8 +924,18 @@ async function canonicalize(document: Record<string, unknown>): Promise<Set<stri
 		nquads
 			.split('\n')
 			.map((line) => line.trim())
-			// Normalize license URL scheme at the N-Quad level too
-			.map((line) => line.replaceAll('https://spdx.org/licenses/', 'http://spdx.org/licenses/'))
+			// Normalize license URL scheme, .html suffix, and deprecated IDs at the N-Quad level
+			.map((line) => line.replaceAll('http://spdx.org/licenses/', 'https://spdx.org/licenses/'))
+			.map((line) => line.replaceAll(/(<https:\/\/spdx\.org\/licenses\/\S+?)\.html>/g, '$1>'))
+			.map((line) => {
+				for (const [deprecated, current] of Object.entries(COMPARE_DEPRECATED_TO_ONLY)) {
+					line = line.replaceAll(
+						`<https://spdx.org/licenses/${deprecated}>`,
+						`<https://spdx.org/licenses/${current}>`,
+					)
+				}
+				return line
+			})
 			// Drop quads with empty literal objects (codemetapy bug)
 			.filter((line) => line !== '' && !line.includes('""')),
 	)
@@ -1008,7 +1040,7 @@ const PREFIXES: Array<[string, string]> = [
 	['https://codemeta.github.io/terms/', 'codemeta:'],
 	['https://w3id.org/codemeta/3.0/', 'codemeta:'],
 	['http://www.w3.org/1999/02/22-rdf-syntax-ns#', 'rdf:'],
-	['http://spdx.org/licenses/', 'spdx:'],
+	['https://spdx.org/licenses/', 'spdx:'],
 	['https://www.repostatus.org/', 'repostatus:'],
 ]
 

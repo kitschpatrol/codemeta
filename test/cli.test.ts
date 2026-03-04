@@ -85,7 +85,7 @@ describe('parser: Node.js package.json', () => {
 
 	it('should extract license as SPDX URI', async () => {
 		const meta = await runJson(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/AGPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/AGPL-3.0-or-later')
 	})
 })
 
@@ -171,7 +171,7 @@ describe('parser: Python setup.py (WASM)', () => {
 
 	it('should extract license', async () => {
 		const meta = await runJson(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 })
 

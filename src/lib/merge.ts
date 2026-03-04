@@ -64,9 +64,9 @@ export function reconcile(meta: Partial<CodeMeta>): ValidationWarning[] {
 function reconcileLicenses(meta: Partial<CodeMeta>, warnings: ValidationWarning[]): void {
 	const licenses: string[] = toArray(meta.license).filter((l): l is string => is.string(l))
 
-	const hasGpl3Only = licenses.includes('http://spdx.org/licenses/GPL-3.0-only')
-	const hasGpl3OrLater = licenses.includes('http://spdx.org/licenses/GPL-3.0-or-later')
-	const hasGpl2OrLater = licenses.includes('http://spdx.org/licenses/GPL-2.0-or-later')
+	const hasGpl3Only = licenses.includes('https://spdx.org/licenses/GPL-3.0-only')
+	const hasGpl3OrLater = licenses.includes('https://spdx.org/licenses/GPL-3.0-or-later')
+	const hasGpl2OrLater = licenses.includes('https://spdx.org/licenses/GPL-2.0-or-later')
 
 	if ((hasGpl3Only || hasGpl3OrLater) && hasGpl2OrLater) {
 		warnings.push({
@@ -75,7 +75,7 @@ function reconcileLicenses(meta: Partial<CodeMeta>, warnings: ValidationWarning[
 			severity: 'warn',
 		})
 		const filtered = licenses.filter(
-			(license) => license !== 'http://spdx.org/licenses/GPL-2.0-or-later',
+			(license) => license !== 'https://spdx.org/licenses/GPL-2.0-or-later',
 		)
 		meta.license = filtered.length === 1 ? filtered[0] : filtered
 	}

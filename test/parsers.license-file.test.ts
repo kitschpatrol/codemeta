@@ -20,14 +20,14 @@ async function parseToJsonLd(filePath: string): Promise<Record<string, unknown>>
 describe('License file parser — LICENCE fixtures', () => {
 	it('should detect MIT from ashuk032-8secread.licence', async () => {
 		const meta = await parseToJsonLd(resolve(fixtures, 'licence/ashuk032-8secread.licence'))
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 
 	it('should detect MIT from base16-builder-base16-builder.licence.md', async () => {
 		const meta = await parseToJsonLd(
 			resolve(fixtures, 'licence/base16-builder-base16-builder.licence.md'),
 		)
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 })
 
@@ -36,7 +36,7 @@ describe('License file parser — LICENCE fixtures', () => {
 describe('License file parser — LICENSE fixtures', () => {
 	it('should detect MIT from socketry-async.license.md', async () => {
 		const meta = await parseToJsonLd(resolve(fixtures, 'license/socketry-async.license.md'))
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 })
 
@@ -47,14 +47,14 @@ describe('License file parser — UNLICENSE fixtures', () => {
 		const meta = await parseToJsonLd(
 			resolve(fixtures, 'unlicense/alex-free-alex-free-github-io.unlicense.md'),
 		)
-		expect(meta.license).toBe('http://spdx.org/licenses/Unlicense')
+		expect(meta.license).toBe('https://spdx.org/licenses/Unlicense')
 	})
 
 	it('should detect Unlicense from budecosystem-bud-runtime.unlicense.md', async () => {
 		const meta = await parseToJsonLd(
 			resolve(fixtures, 'unlicense/budecosystem-bud-runtime.unlicense.md'),
 		)
-		expect(meta.license).toBe('http://spdx.org/licenses/Unlicense')
+		expect(meta.license).toBe('https://spdx.org/licenses/Unlicense')
 	})
 })
 
@@ -65,7 +65,7 @@ describe('License file parser — COPYING fixtures', () => {
 		const meta = await parseToJsonLd(
 			resolve(fixtures, 'copying/callofduty4x-cod4x-server.copying.md'),
 		)
-		expect(meta.license).toBe('http://spdx.org/licenses/AGPL-3.0-only')
+		expect(meta.license).toBe('https://spdx.org/licenses/AGPL-3.0-only')
 	})
 
 	it('should not match when COPYING contains description, not license text', async () => {
@@ -75,16 +75,16 @@ describe('License file parser — COPYING fixtures', () => {
 	})
 })
 
-// ─── Precedence ───
+// ─── Accumulation ───
 
-describe('License file parser — lower precedence than other parsers', () => {
-	it('should not override an existing license', async () => {
+describe('License file parser — accumulates with existing licenses', () => {
+	it('should add alongside an existing license', async () => {
 		const graph = new CodeMetaGraph()
 		const subject = namedNode(SUBJECT)
 		graph.setType(subject, schema('SoftwareSourceCode'))
 
 		// Simulate another parser having already set a license
-		graph.addUrl(subject, schema('license'), 'http://spdx.org/licenses/Apache-2.0')
+		graph.addUrl(subject, schema('license'), 'https://spdx.org/licenses/Apache-2.0')
 
 		await parseLicenseFile(
 			resolve(fixtures, 'licence/ashuk032-8secread.licence'),
@@ -94,7 +94,30 @@ describe('License file parser — lower precedence than other parsers', () => {
 		)
 
 		const meta = await graph.toJsonLd(SUBJECT)
-		expect(meta.license).toBe('http://spdx.org/licenses/Apache-2.0')
+		expect(meta.license).toEqual([
+			'https://spdx.org/licenses/Apache-2.0',
+			'https://spdx.org/licenses/MIT',
+		])
+	})
+
+	it('should deduplicate when license file matches existing license', async () => {
+		const graph = new CodeMetaGraph()
+		const subject = namedNode(SUBJECT)
+		graph.setType(subject, schema('SoftwareSourceCode'))
+
+		// Simulate another parser having already set MIT
+		graph.addUrl(subject, schema('license'), 'https://spdx.org/licenses/MIT')
+
+		await parseLicenseFile(
+			resolve(fixtures, 'licence/ashuk032-8secread.licence'),
+			graph,
+			subject,
+			crosswalk,
+		)
+
+		const meta = await graph.toJsonLd(SUBJECT)
+		// Should deduplicate to a single MIT license
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 })
 

@@ -47,10 +47,10 @@ describe('CodeMetaGraph.toJsonLd', () => {
 	it('should serialize URL properties', async () => {
 		const doc = await graphToJsonLd((graph, subject) => {
 			graph.addUrl(subject, schema('codeRepository'), 'https://github.com/test/test')
-			graph.addUrl(subject, schema('license'), 'http://spdx.org/licenses/MIT')
+			graph.addUrl(subject, schema('license'), 'https://spdx.org/licenses/MIT')
 		})
 		expect(doc.codeRepository).toBe('https://github.com/test/test')
-		expect(doc.license).toBe('http://spdx.org/licenses/MIT')
+		expect(doc.license).toBe('https://spdx.org/licenses/MIT')
 	})
 
 	it('should serialize person blank nodes', async () => {

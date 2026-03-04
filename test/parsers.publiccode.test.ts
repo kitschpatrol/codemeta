@@ -43,7 +43,7 @@ describe('publiccode.yml parser — basic properties', () => {
 
 	it('should parse license', async () => {
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 
 	it('should parse description from English longDescription', async () => {
@@ -113,7 +113,7 @@ describe('publiccode.yml parser — complex properties', () => {
 	it('should parse license from legal section', async () => {
 		const fixture = resolve(fixtures, 'kadas-albireo-kadas-albireo2.publiccode.yml')
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-2.0-only')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-2.0-only')
 	})
 
 	it('should parse contractors as contributor Organizations', async () => {
@@ -158,7 +158,7 @@ describe('publiccode.yml parser — complex properties', () => {
 	it('should parse AGPL-3.0-only license', async () => {
 		const fixture = resolve(fixtures, 'zammad-zammad.publiccode.yml')
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/AGPL-3.0-only')
+		expect(meta.license).toBe('https://spdx.org/licenses/AGPL-3.0-only')
 	})
 
 	it('should parse inputTypes and outputTypes as fileFormat', async () => {
@@ -172,7 +172,7 @@ describe('publiccode.yml parser — complex properties', () => {
 	it('should parse EUPL-1.2 license', async () => {
 		const fixture = resolve(fixtures, 'conductionnl-education-component.publiccode.yaml')
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/EUPL-1.2')
+		expect(meta.license).toBe('https://spdx.org/licenses/EUPL-1.2')
 	})
 
 	it('should handle roadmap URL', async () => {

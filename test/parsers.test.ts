@@ -37,7 +37,7 @@ describe('Node.js parser', () => {
 
 		expect(meta.name).toBe('labirinto')
 		expect(meta.version).toBe('0.2.6')
-		expect(meta.license).toBe('http://spdx.org/licenses/AGPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/AGPL-3.0-or-later')
 		const authors = [meta.author].flat() as Array<Record<string, unknown>>
 		expect(authors).toHaveLength(1)
 		expect(authors[0].givenName).toBe('Maarten')
@@ -97,7 +97,7 @@ describe('Rust parser', () => {
 
 		expect(meta.name).toBe('analiticcl')
 		expect(meta.version).toBe('0.4.5')
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-3.0-or-later')
 		expect(meta.programmingLanguage).toBe('Rust')
 		const authors = [meta.author].flat() as Array<Record<string, unknown>>
 		expect(authors).toHaveLength(1)
@@ -191,7 +191,7 @@ describe('JSON-LD parser', () => {
 			resolve(fixtures, 'codemeta/languagemachines-frog.codemeta.json'),
 		)
 		expect(meta.codeRepository).toBe('https://github.com/LanguageMachines/frog')
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-3.0-only')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-3.0-only')
 		expect(meta.url).toBe('https://languagemachines.github.io/frog')
 	})
 
@@ -369,7 +369,7 @@ describe('JSON-LD parser', () => {
 		expect(meta.name).toBe('Frog')
 		expect(meta.version).toBe('0.26')
 		expect(meta.description).toBeDefined()
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-3.0-only')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-3.0-only')
 		expect(meta.codeRepository).toBe('https://github.com/LanguageMachines/frog')
 		expect(meta.url).toBe('https://languagemachines.github.io/frog')
 	})
@@ -518,7 +518,7 @@ describe('Python parser', () => {
 		expect(meta.name).toBe('codemetapy')
 		expect(meta.version).toBe('2.5.3')
 		expect(meta.description).toBe('Generate and manage CodeMeta software metadata')
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-3.0-or-later')
 		const authors = [meta.author].flat() as Array<Record<string, unknown>>
 		expect(authors).toHaveLength(1)
 		expect(authors[0].givenName).toBe('Maarten')

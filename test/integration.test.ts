@@ -41,7 +41,7 @@ describe('compose: labirinto.package.json + proycon-labirinto-harvest.codemeta.j
 	it('should have URL references', async () => {
 		const meta = await loadComposed()
 		expect(meta.codeRepository).toBe('https://github.com/proycon/labirinto')
-		expect(meta.license).toBe('http://spdx.org/licenses/AGPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/AGPL-3.0-or-later')
 		expect(meta.url).toBe('https://github.com/proycon/labirinto')
 	})
 

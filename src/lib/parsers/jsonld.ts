@@ -138,22 +138,36 @@ function remapTerm(term: Term, original: Term | undefined, target: NamedNode): T
 }
 
 /**
- * Normalize bare SPDX identifiers in the license field to full URLs.
- * The codemeta context types license as \@id, so bare strings like "MIT"
- * get expanded as relative IRIs and lost. Convert them to spdx.org URLs.
+ * Normalize license values for consistency before JSON-LD expansion.
+ * - Bare identifiers like "MIT" → full SPDX URLs (required because the
+ *   codemeta context types license as \@id, so bare strings get mangled
+ *   into relative IRIs during expansion).
+ * - SPDX URLs → normalized scheme (http → https) and deprecated IDs
+ *   (e.g. LGPL-3.0 → LGPL-3.0-only).
+ * - Other URLs (e.g. GitHub LICENSE links) → passed through unchanged.
  */
 function normalizeLicenseField(data: Record<string, unknown>): void {
 	const { license } = data
-	if (is.string(license) && !license.startsWith('http')) {
-		data.license = licenseToSpdx(license)
+	if (is.string(license)) {
+		data.license = normalizeSingleLicense(license)
 	} else if (is.array(license)) {
-		data.license = license.map((item) => {
-			if (is.string(item) && !item.startsWith('http')) {
-				return licenseToSpdx(item)
-			}
-			return item
-		})
+		data.license = license.map((item) => (is.string(item) ? normalizeSingleLicense(item) : item))
 	}
+}
+
+/** Normalize a single license value: bare IDs and SPDX URLs through licenseToSpdx, others as-is. */
+function normalizeSingleLicense(value: string): string {
+	// Bare SPDX IDs and SPDX URLs → normalize via licenseToSpdx
+	if (
+		!value.startsWith('http') ||
+		value.startsWith('http://spdx.org/licenses/') ||
+		value.startsWith('https://spdx.org/licenses/')
+	) {
+		return licenseToSpdx(value)
+	}
+
+	// Other URLs (GitHub, OSI, custom) → pass through
+	return value
 }
 
 /**

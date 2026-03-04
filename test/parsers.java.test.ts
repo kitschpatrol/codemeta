@@ -32,7 +32,7 @@ describe('Java parser — feature-rich POM (pennstate-alexa-tools)', () => {
 
 	it('should parse license from name and url', async () => {
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/Apache-2.0')
+		expect(meta.license).toBe('https://spdx.org/licenses/Apache-2.0')
 	})
 
 	it('should parse developers as authors', async () => {

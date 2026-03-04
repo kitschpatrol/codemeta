@@ -39,7 +39,7 @@ describe('setup.py parser — basic', () => {
 
 	it('should parse license', async () => {
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 
 	it('should parse keywords', async () => {
@@ -93,7 +93,7 @@ describe('setup.py parser — with variables', () => {
 		// Literals should be extracted
 		expect(meta.name).toBe('dynamic-pkg')
 		expect(meta.description).toBe('Package with variables')
-		expect(meta.license).toBe('http://spdx.org/licenses/BSD-3-Clause')
+		expect(meta.license).toBe('https://spdx.org/licenses/BSD-3-Clause')
 	})
 
 	it('should still parse literal dependencies', async () => {

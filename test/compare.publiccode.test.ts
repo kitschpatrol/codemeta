@@ -51,7 +51,7 @@ describe('publiccode.yml — well-formed output', () => {
 				for (const license of licenses) {
 					// Should be a valid SPDX URL
 					expect(typeof license).toBe('string')
-					expect(license).toMatch(/^http:\/\/spdx\.org\/licenses\//)
+					expect(license).toMatch(/^https:\/\/spdx\.org\/licenses\//)
 				}
 			}
 		})

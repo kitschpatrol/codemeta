@@ -25,7 +25,7 @@ describe('Node.js parser', () => {
 		console.log(meta)
 		expect(meta.name).toBe('labirinto')
 		expect(meta.version).toBe('0.2.6')
-		expect(meta.license).toBe('http://spdx.org/licenses/AGPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/AGPL-3.0-or-later')
 		const authors = [meta.author].flat() as Array<Record<string, unknown>>
 		expect(authors).toHaveLength(1)
 		expect(authors[0].givenName).toBe('Maarten')

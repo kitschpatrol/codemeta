@@ -123,11 +123,44 @@ function diceCoefficientCached(
 }
 
 /**
+ * Title-based identification for GNU licenses whose SPDX templates embed
+ * combined texts (e.g. LGPL-3.0-only = LGPL supplement + full GPL), making
+ * Dice coefficient unreliable against real-world standalone files.
+ * Only checks the first 500 characters to avoid matching references in
+ * unrelated license texts (e.g. CeCILL-2.1 mentions AGPL in its body).
+ */
+const HEADER_PATTERNS: Array<{ pattern: RegExp; spdxId: string }> = [
+	{ pattern: /gnu lesser general public license\s+version 3/i, spdxId: 'LGPL-3.0-only' },
+	{ pattern: /gnu lesser general public license\s+version 2\.1/i, spdxId: 'LGPL-2.1-only' },
+	{
+		pattern: /gnu lesser general public license\s+version 2(?:\.0)?(?!\.\d)/i,
+		spdxId: 'LGPL-2.0-only',
+	},
+	{ pattern: /gnu affero general public license\s+version 3/i, spdxId: 'AGPL-3.0-only' },
+]
+
+function identifyByHeader(text: string): LicenseMatch | undefined {
+	const header = text.slice(0, 500)
+	for (const { pattern, spdxId } of HEADER_PATTERNS) {
+		if (pattern.test(header)) {
+			return { confidence: 1, spdxId }
+		}
+	}
+
+	return undefined
+}
+
+/**
  * Identify the SPDX license that best matches the given text.
  * Returns the best match with confidence score, or undefined if no match
  * exceeds the confidence threshold.
  */
 export function identifyLicense(text: string): LicenseMatch | undefined {
+	// Quick header-based check for GNU licenses whose SPDX templates
+	// include combined texts that don't match real-world standalone files
+	const headerMatch = identifyByHeader(text)
+	if (headerMatch) return headerMatch
+
 	const normalizedInput = normalizeInput(text)
 
 	if (normalizedInput.length < 2) return undefined

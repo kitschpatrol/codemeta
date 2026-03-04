@@ -22,15 +22,15 @@ describe('reconcile', () => {
 	it('should fix GPL-3.0-only + GPL-2.0-or-later conflict', () => {
 		const meta: Partial<CodeMeta> = {
 			license: [
-				'http://spdx.org/licenses/GPL-3.0-only',
-				'http://spdx.org/licenses/GPL-2.0-or-later',
+				'https://spdx.org/licenses/GPL-3.0-only',
+				'https://spdx.org/licenses/GPL-2.0-or-later',
 			],
 		}
 		const warnings = reconcile(meta)
 		expect(
 			warnings.some((warning) => warning.property === 'license' && warning.message.includes('GPL')),
 		).toBe(true)
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-3.0-only')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-3.0-only')
 	})
 
 	it('should warn about missing license', () => {
@@ -43,7 +43,7 @@ describe('reconcile', () => {
 		const meta: Partial<CodeMeta> = {
 			author: [{ '@type': 'Person', familyName: 'Doe', givenName: 'John' }],
 			codeRepository: 'https://github.com/test/test',
-			license: 'http://spdx.org/licenses/MIT',
+			license: 'https://spdx.org/licenses/MIT',
 			name: 'test',
 		}
 		const warnings = reconcile(meta)
@@ -55,7 +55,7 @@ describe('reconcile', () => {
 
 	it('should detect GPL + non-GPL license conflict', () => {
 		const meta: Partial<CodeMeta> = {
-			license: ['http://spdx.org/licenses/GPL-3.0-only', 'http://spdx.org/licenses/MIT'],
+			license: ['https://spdx.org/licenses/GPL-3.0-only', 'https://spdx.org/licenses/MIT'],
 		}
 		const warnings = reconcile(meta)
 		expect(

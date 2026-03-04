@@ -26,7 +26,7 @@ describe('Pyproject parser — PEP 621 (proycon-codemetapy)', () => {
 		expect(meta.identifier).toBe('codemetapy')
 		expect(meta.version).toBe('2.5.3')
 		expect(meta.description).toBe('Generate and manage CodeMeta software metadata')
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-3.0-or-later')
 	})
 
 	it('should parse authors', async () => {
@@ -101,7 +101,7 @@ describe('Pyproject parser — PEP 621 with complex features', () => {
 		// Ameli-special-functions has license = { file = "LICENSE.txt" } — no text
 		// smol-ai-developer has license = "MIT" — string
 		const meta = await parseToJsonLd(resolve(fixtures, 'smol-ai-developer.pyproject.toml'))
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 
 	it('should handle optional-dependencies as softwareSuggestions', async () => {

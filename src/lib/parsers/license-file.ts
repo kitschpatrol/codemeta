@@ -13,7 +13,9 @@ import { identifyLicense } from '../utilities/license-matcher.js'
 
 /**
  * Parse a license file and emit the detected SPDX license.
- * Only emits if no license has been set by other parsers.
+ * Always emits — multiple license files (e.g. COPYING + COPYING.LESSER)
+ * each contribute their license. Duplicates are removed during
+ * post-serialization deduplication.
  */
 export async function parseLicenseFile(
 	filePath: string,
@@ -21,11 +23,6 @@ export async function parseLicenseFile(
 	subject: NamedNode,
 	_crosswalk: Crosswalk,
 ): Promise<string[]> {
-	// Only suggest a license if none has been set by higher-precedence parsers
-	if (graph.hasProperty(subject, schema('license'))) {
-		return []
-	}
-
 	const content = readFileSync(filePath, 'utf8')
 	const match = identifyLicense(content)
 

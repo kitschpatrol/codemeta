@@ -47,7 +47,7 @@ describe('gemspec parser — basic properties', () => {
 
 	it('should parse license', async () => {
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 
 	it('should parse single author', async () => {
@@ -122,7 +122,7 @@ describe('gemspec parser — complex properties', () => {
 	it('should parse Apache-2.0 license', async () => {
 		const fixture = resolve(fixtures, 'apache-arrow.red-arrow-cuda.gemspec')
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/Apache-2.0')
+		expect(meta.license).toBe('https://spdx.org/licenses/Apache-2.0')
 	})
 
 	it('should parse homepage that is not a source repo as url only', async () => {

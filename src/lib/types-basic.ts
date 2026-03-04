@@ -96,7 +96,7 @@ export type CodeMetaBasic = {
 	// ─── Always arrays (PersonOrOrg) ──────────────────────────────
 	/** Keywords or tags. Always an array. */
 	keywords?: string[]
-	/** License URL(s) (typically SPDX URIs like http://spdx.org/licenses/MIT). Always an array. */
+	/** License URL(s) (typically SPDX URIs like https://spdx.org/licenses/MIT). Always an array. */
 	license?: string[]
 	/** Maintainer(s) of the software. Always an array. */
 	maintainer?: BasicPersonOrOrg[]

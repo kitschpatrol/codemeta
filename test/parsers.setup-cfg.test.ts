@@ -39,7 +39,7 @@ describe('setup.cfg parser — basic', () => {
 
 	it('should parse license', async () => {
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 
 	it('should parse classifiers into development status', async () => {

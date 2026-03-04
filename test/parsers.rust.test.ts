@@ -32,7 +32,7 @@ describe('Rust parser — basic Cargo.toml (proycon-analiticcl)', () => {
 
 	it('should parse license', async () => {
 		const meta = await parseToJsonLd(fixture)
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-3.0-or-later')
 	})
 
 	it('should parse author', async () => {
@@ -107,8 +107,8 @@ describe('Rust parser — compound license (smol-rs-smol)', () => {
 	it('should split SPDX OR license into multiple entries', async () => {
 		const meta = await parseToJsonLd(fixture)
 		const licenses = Array.isArray(meta.license) ? meta.license : [meta.license]
-		expect(licenses).toContain('http://spdx.org/licenses/Apache-2.0')
-		expect(licenses).toContain('http://spdx.org/licenses/MIT')
+		expect(licenses).toContain('https://spdx.org/licenses/Apache-2.0')
+		expect(licenses).toContain('https://spdx.org/licenses/MIT')
 	})
 
 	it('should parse categories as applicationCategory', async () => {

@@ -1,7 +1,7 @@
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { crosswalk } from '../src/lib/crosswalk.js'
-import { CodeMetaGraph, namedNode, schema } from '../src/lib/graph.js'
+import { codemeta, CodeMetaGraph, namedNode, schema } from '../src/lib/graph.js'
 import { parseReadme } from '../src/lib/parsers/readme.js'
 
 const fixtures = resolve(import.meta.dirname, 'fixtures/readme')
@@ -36,6 +36,51 @@ describe('README parser — H1 extraction', () => {
 	it('should not set name when there is no H1 heading', async () => {
 		const meta = await parseToJsonLd(resolve(fixtures, '0apocalypse0-ecommerceproject.readme.md'))
 		expect(meta.name).toBeUndefined()
+	})
+})
+
+describe('README parser — readme property emission', () => {
+	it('should emit readme filename when no codeRepository is set', async () => {
+		const meta = await parseToJsonLd(
+			resolve(fixtures, '74th-qmk-firmware-sparrow-keyboard.readme.md'),
+		)
+		expect(meta.readme).toBe('74th-qmk-firmware-sparrow-keyboard.readme.md')
+	})
+
+	it('should emit web URL when GitHub codeRepository is set', async () => {
+		const graph = new CodeMetaGraph()
+		const subject = namedNode(SUBJECT)
+		graph.setType(subject, schema('SoftwareSourceCode'))
+		graph.addUrl(subject, schema('codeRepository'), 'https://github.com/example/repo')
+
+		await parseReadme(
+			resolve(fixtures, '74th-qmk-firmware-sparrow-keyboard.readme.md'),
+			graph,
+			subject,
+			crosswalk,
+		)
+
+		const meta = await graph.toJsonLd(SUBJECT)
+		expect(meta.readme).toBe(
+			'https://github.com/example/repo/blob/HEAD/74th-qmk-firmware-sparrow-keyboard.readme.md',
+		)
+	})
+
+	it('should not override an existing readme', async () => {
+		const graph = new CodeMetaGraph()
+		const subject = namedNode(SUBJECT)
+		graph.setType(subject, schema('SoftwareSourceCode'))
+		graph.addUrl(subject, codemeta('readme'), 'https://example.com/existing-readme')
+
+		await parseReadme(
+			resolve(fixtures, '74th-qmk-firmware-sparrow-keyboard.readme.md'),
+			graph,
+			subject,
+			crosswalk,
+		)
+
+		const meta = await graph.toJsonLd(SUBJECT)
+		expect(meta.readme).toBe('https://example.com/existing-readme')
 	})
 })
 

@@ -54,17 +54,17 @@ describe('GoReleaser parser — basic metadata', () => {
 describe('GoReleaser parser — license', () => {
 	it('should extract license from nfpms and normalize to SPDX URI', async () => {
 		const meta = await parseToJsonLd(resolve(fixtures, 'jbvmio-kafkactl..goreleaser.yml'))
-		expect(meta.license).toBe('http://spdx.org/licenses/Apache-2.0')
+		expect(meta.license).toBe('https://spdx.org/licenses/Apache-2.0')
 	})
 
 	it('should extract license from scoop section', async () => {
 		const meta = await parseToJsonLd(resolve(fixtures, 'aenthill-aenthill..goreleaser.yml'))
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 
 	it('should extract license from brews', async () => {
 		const meta = await parseToJsonLd(resolve(fixtures, 'arashnrim-tp..goreleaser.yaml'))
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 })
 
@@ -161,7 +161,7 @@ describe('GoReleaser parser — rich metadata', () => {
 		expect(meta.name).toBe('golangci-lint')
 		expect(meta.programmingLanguage).toBe('Go')
 		expect(meta.description).toBeDefined()
-		expect(meta.license).toBe('http://spdx.org/licenses/GPL-3.0-or-later')
+		expect(meta.license).toBe('https://spdx.org/licenses/GPL-3.0-or-later')
 		expect(meta.codeRepository).toBe('https://github.com/golangci/golangci-lint')
 	})
 
@@ -169,7 +169,7 @@ describe('GoReleaser parser — rich metadata', () => {
 		const meta = await parseToJsonLd(resolve(fixtures, 'graphixa-fontget..goreleaser.yaml'))
 		expect(meta.name).toBe('fontget')
 		expect(meta.description).toBe('FontGet CLI tool for managing fonts')
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 		expect(meta.url).toBe('https://github.com/Graphixa/FontGet')
 		expect(meta.codeRepository).toBe('https://github.com/Graphixa/FontGet')
 
@@ -205,7 +205,7 @@ describe('GoReleaser parser — minimal configs', () => {
 		// No project_name field — name should be undefined
 		expect(meta.name).toBeUndefined()
 		// But description, license, etc. should still be extracted
-		expect(meta.license).toBe('http://spdx.org/licenses/MIT')
+		expect(meta.license).toBe('https://spdx.org/licenses/MIT')
 	})
 })
 
