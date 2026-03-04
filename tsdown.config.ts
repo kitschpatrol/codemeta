@@ -3,6 +3,12 @@ import { defineConfig } from 'tsdown'
 export default defineConfig([
 	// CLI
 	{
+		copy: [
+			{
+				from: 'node_modules/web-tree-sitter/web-tree-sitter.wasm',
+				to: 'dist/bin',
+			},
+		],
 		dts: false,
 		entry: 'src/bin/cli.ts',
 		fixedExtension: false,
