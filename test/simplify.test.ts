@@ -46,7 +46,7 @@ describe('simplify — singular properties', () => {
 
 	it('should coerce an object with @id to a string', () => {
 		const result = simplify(codeMeta({ license: { '@id': 'http://spdx.org/licenses/MIT' } }))
-		expect(result.license).toBe('http://spdx.org/licenses/MIT')
+		expect(result.license).toEqual(['http://spdx.org/licenses/MIT'])
 	})
 
 	it('should coerce an object with name to a string', () => {
